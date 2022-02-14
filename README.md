@@ -25,6 +25,7 @@ Revised: 2022/02/14
 
 ## Simulation Sample
 
+Ref. docs/README.pdf
 Equation of motion ($x = x(t)$)
 
 $m \frac{d^2x}{dt^2} + c \frac{dx}{dt} + kx = 0$
@@ -38,10 +39,10 @@ $x - t$ curve;
 
 ## Make usage
 
-| Command    |      Description      |
-| :--------- | :-------------------: |
-| `make run` |       cargo run       |
-| `make ch`  | (default) cargo check |
+| Command    |      Description       |
+| :--------- | :--------------------: |
+| `make run` |       cargo run        |
+| `make ch`  | (default:) cargo check |
 
 If you are using windows, you can install the `make` command [here](http://gnuwin32.sourceforge.net/packages/make.htm).
 (Click the `Setup` button at the top.)
