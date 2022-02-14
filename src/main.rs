@@ -83,24 +83,23 @@ fn runge_kutta(x: f64, v: f64, t: f64) -> (f64, f64) {
     (dx, dv)
 }
 
-fn leap_frog(i: i32, mut x: f64, mut v: f64, t: f64) -> (f64, f64) {
-    // Euler
-    if i == 0 {
-        x = x + f(x, v, t) * DELTA_T;
-    }
-    // leap-frog
-    v = v + 2.0 * f(x, v, t + DELTA_T) * DELTA_T;
-    x = x + 2.0 * v * DELTA_T;
-    (x, v)
-}
+// fn leap_frog(i: i32, mut x: f64, mut v: f64, t: f64) -> (f64, f64) {
+//     // Euler
+//     if i == 0 {
+//         x = x + f(x, v, t) * DELTA_T;
+//     }
+//     // leap-frog
+//     v = v + 2.0 * f(x, v, t + DELTA_T) * DELTA_T;
+//     x = x + 2.0 * v * DELTA_T;
+//     (x, v)
+// }
 
 fn output(x: f64, v: f64, t: f64, file_path: &str) {
     // create a file
     let mut file = fs::File::create(file_path).unwrap();
     // write text in the file
-    file.write_all(b"t, v, x\n");
-    file.write_all(format!("{}, {}, {},", t, v, x).as_bytes())
-        .unwrap();
+    write!(file, "t, v, x\n").unwrap();
+    write!(file, "{}, {}, {},", t, v, x).unwrap()
 }
 
 fn plot(x: Vec<f64>, y: Vec<f64>, img_path: &str) {
@@ -108,5 +107,5 @@ fn plot(x: Vec<f64>, y: Vec<f64>, img_path: &str) {
     let img_path = img_path;
     fg.set_terminal("pngcairo", img_path);
     fg.axes2d().lines(&x, &y, &[Caption("EOM"), Color("blue")]);
-    fg.show();
+    fg.show().unwrap();
 }
