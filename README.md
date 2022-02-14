@@ -26,6 +26,7 @@ Revised: 2022/02/14
 ## Simulation Sample
 
 Ref. docs/README.pdf
+
 Equation of motion ($x = x(t)$)
 
 $m \frac{d^2x}{dt^2} + c \frac{dx}{dt} + kx = 0$
