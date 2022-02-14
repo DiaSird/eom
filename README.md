@@ -32,7 +32,7 @@ $m \frac{d^2x}{dt^2} + c \frac{dx}{dt} + kx = 0$
 $x - t$ curve;
 
 <p align="center">
-<img src="rk_4\img\output.png">
+<img src="docs\output.png", width="100%">
 
 </p>
 
