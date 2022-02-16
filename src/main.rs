@@ -9,34 +9,64 @@ use std::fs;
 use std::io::prelude::*;
 use std::time::Instant;
 
-// parameters
-const K: f64 = 1.0; // spring [mN/mm]
-const C: f64 = 1.0; // damper [N/(mm/ms)]
-const M: f64 = 1.0; // mass [kg]
+struct System {
+    k: f64,       // spring [mN/mm]
+    c: f64,       // damper [N/(mm/ms)]
+    m: f64,       // mass [kg]
+    x0: f64,      // initial position [mm]
+    v0: f64,      // v0 = dx/dt|t=0
+    n: i32,       // max loop number
+    delta_t: f64, // dt [s]
+}
 
-// Initial setup
-const X0: f64 = 0.0;
-const V0: f64 = 1.0; // V0 = dx/dt|t=0
+impl System {
+    // Define dy/dx = f(x)
+    fn f(&self, x: f64, v: f64, _t: f64) -> f64 {
+        (-self.c * v - self.k * x) / self.m
+    }
+}
 
-// step size
-const N: i32 = 1000; // max loop number
-const DELTA_T: f64 = 0.01; // dt [s]
-
-// file path
-const FILE_PATH: &str = "dist/output.csv";
-const IMG_PATH: &str = "img/output.png";
+impl System {
+    // Runge-Kutta 4th order
+    fn runge_kutta(&self, x: f64, v: f64, t: f64) -> (f64, f64) {
+        let k1v = self.f(x, v, t) * self.delta_t;
+        let k1x = v * self.delta_t;
+        let k2x = (v + k1v / 2.0) * self.delta_t;
+        let k2v = self.f(x + k1x / 2.0, v + k1v / 2.0, t + self.delta_t / 2.0) * self.delta_t;
+        let k3v = self.f(x + k2x / 2.0, v + k2v / 2.0, t + self.delta_t / 2.0) * self.delta_t;
+        let k3x = (v + k2v / 2.0) * self.delta_t;
+        let k4v = self.f(x + k3x, v + k3v, t + self.delta_t) * self.delta_t;
+        let k4x = (v + k3v) * self.delta_t;
+        let dv = (k1v + 2.0 * k2v + 2.0 * k3v + k4v) / 6.0;
+        let dx = (k1x + 2.0 * k2x + 2.0 * k3x + k4x) / 6.0;
+        (dx, dv)
+    }
+}
 
 pub fn main() {
     let start = Instant::now();
     // Initialize
-    let (mut x, mut v) = (X0, V0);
+    let params = System {
+        k: 1.0,        // [mN/mm]
+        c: 1.0,        // [N/(mm/ms)]
+        m: 1.0,        // [kg]
+        x0: 0.0,       // [mm]
+        v0: 1.0,       // [mm/ms]
+        n: 1000,       // loop
+        delta_t: 0.01, // [ms]
+    };
+    // file path
+    const FILE_PATH: &str = "dist/output.csv";
+    const IMG_PATH: &str = "img/output.png";
+
+    let (mut x, mut v) = (params.x0, params.v0);
     let mut xs = vec![];
     let mut ts = vec![];
     // Iteration
-    for i in 1..N {
-        let t = (i as f64) * DELTA_T;
+    for i in 1..params.n {
+        let t = (i as f64) * params.delta_t;
         // Runge-Kutta 4th
-        let (dx, dv) = runge_kutta(x, v, t);
+        let (dx, dv) = params.runge_kutta(x, v, t);
         x += dx;
         v += dv;
         // leap_frog(i, x, v, t);
@@ -47,16 +77,11 @@ pub fn main() {
         xs.push(x);
     }
     // output last results
-    output(x, v, (N as f64) * DELTA_T, FILE_PATH);
+    output(x, v, (params.n as f64) * params.delta_t, FILE_PATH);
     // image
     plot(ts, xs, IMG_PATH);
     // CPU time
     time(start);
-}
-
-// Define dy/dx = f(x)
-fn f(x: f64, v: f64, _t: f64) -> f64 {
-    -(C * v) / M - (K * x) / M
 }
 
 // measure CPU time
@@ -67,20 +92,6 @@ fn time(start: Instant) {
         end.as_secs(),
         end.subsec_nanos() / 1_000_000
     );
-}
-
-fn runge_kutta(x: f64, v: f64, t: f64) -> (f64, f64) {
-    let k1v = f(x, v, t) * DELTA_T;
-    let k1x = v * DELTA_T;
-    let k2x = (v + k1v / 2.0) * DELTA_T;
-    let k2v = f(x + k1x / 2.0, v + k1v / 2.0, t + DELTA_T / 2.0) * DELTA_T;
-    let k3v = f(x + k2x / 2.0, v + k2v / 2.0, t + DELTA_T / 2.0) * DELTA_T;
-    let k3x = (v + k2v / 2.0) * DELTA_T;
-    let k4v = f(x + k3x, v + k3v, t + DELTA_T) * DELTA_T;
-    let k4x = (v + k3v) * DELTA_T;
-    let dv = (k1v + 2.0 * k2v + 2.0 * k3v + k4v) / 6.0;
-    let dx = (k1x + 2.0 * k2x + 2.0 * k3x + k4x) / 6.0;
-    (dx, dv)
 }
 
 // fn leap_frog(i: i32, mut x: f64, mut v: f64, t: f64) -> (f64, f64) {
