@@ -5,9 +5,7 @@ Ref.
 [2] https://kiito.hatenablog.com/entry/2019/02/11/172125
 -------------------------------------------------*/
 use gnuplot::{Caption, Color, Figure};
-use std::fs;
-use std::io::prelude::*;
-use std::time::Instant;
+use std::{fs, io::prelude::*, time::Instant, *};
 
 struct System {
     k: f64,       // spring [mN/mm]
