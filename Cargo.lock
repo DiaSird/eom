@@ -18,7 +18,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "rk_4"
+name = "rust_numerical"
 version = "0.1.0"
 dependencies = [
  "gnuplot",

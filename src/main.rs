@@ -5,9 +5,12 @@ Ref.
 [2] https://kiito.hatenablog.com/entry/2019/02/11/172125
 -------------------------------------------------*/
 use gnuplot::{Caption, Color, Figure};
-use std::{fs, io::prelude::*, time::Instant, *};
+use std::{error, fs::File};
+use std::io::prelude::*;
+use std::time::Instant;
+use std::io::BufWriter;
 
-struct System {
+pub struct System {
     k: f64,       // spring [mN/mm]
     c: f64,       // damper [N/(mm/ms)]
     m: f64,       // mass [kg]
@@ -39,6 +42,16 @@ impl System {
         let dx = (k1x + 2.0 * k2x + 2.0 * k3x + k4x) / 6.0;
         (dx, dv)
     }
+
+    // fn leap_frog(&self, x: f64, v: f64, t: f64) -> (f64, f64) {
+    //     let k1v = self.f(x, v, t) * self.delta_t;
+    //     let k1x = v * self.delta_t;
+    //     let k2x = (v + k1v / 2.0) * self.delta_t;
+    //     let k2v = self.f(x + k1x / 2.0, v + k1v / 2.0, t + self.delta_t / 2.0) * self.delta_t;
+    //     let dv = (k1v + 2.0 * k2v + 2.0 * k2v ) / 6.0;
+    //     let dx = (k1x + 2.0 * k2x + 2.0 * k2x ) / 6.0;
+    //     (dx, dv)
+    // }
 }
 
 pub fn main() {
@@ -53,31 +66,43 @@ pub fn main() {
         n: 1000,       // loop
         delta_t: 0.01, // [ms]
     };
-    // file path
-    const FILE_PATH: &str = "dist/output.csv";
-    const IMG_PATH: &str = "img/output.png";
 
+    // file path
+    let file_path: &str = "dist/output";
+    let img_path: &str = "img/output.png";
+
+    // Initialize
     let (mut x, mut v) = (params.x0, params.v0);
-    let mut xs = vec![];
+
     let mut ts = vec![];
+    let mut vs = vec![];
+    let mut xs = vec![];
+
     // Iteration
-    for i in 1..params.n {
+    for i in 0..=params.n {
         let t = (i as f64) * params.delta_t;
-        // Runge-Kutta 4th
-        let (dx, dv) = params.runge_kutta(x, v, t);
-        x += dx;
+        let (dx, dv) =
+            params.runge_kutta(x, v, t);
+            // params.leap_frog(i, x, v, t);
+
         v += dv;
-        // leap_frog(i, x, v, t);
-        // x += x;
-        // v += v;
-        // println!("{:<5.3}", x);
+        x += dx;
+
         ts.push(t);
+        vs.push(v);
         xs.push(x);
     }
-    // output last results
-    output(x, v, (params.n as f64) * params.delta_t, FILE_PATH);
+    let tp = ts.clone();
+    let xp = xs.clone();
+
+    // csv
+    let n = params.n as usize;
+    write_csv(n, ts, vs, xs, file_path)
+            .map_err(|e| println!("{}", e))
+            .ok();
+
     // image
-    plot(ts, xs, IMG_PATH);
+    plot(tp, xp, img_path);
     // CPU time
     time(start);
 }
@@ -92,28 +117,33 @@ fn time(start: Instant) {
     );
 }
 
-// fn leap_frog(i: i32, mut x: f64, mut v: f64, t: f64) -> (f64, f64) {
-//     // Euler
-//     if i == 0 {
-//         x = x + f(x, v, t) * DELTA_T;
-//     }
-//     // leap-frog
-//     v = v + 2.0 * f(x, v, t + DELTA_T) * DELTA_T;
-//     x = x + 2.0 * v * DELTA_T;
-//     (x, v)
-// }
+fn write_csv(n: usize, t: Vec<f64>, v: Vec<f64>, x: Vec<f64>, file_path: &str) 
+    -> Result<(), Box<dyn error::Error>> {
+    let file_name: String = format!("{}.csv", file_path);
+    let file = File::create(file_name).unwrap();
 
-fn output(x: f64, v: f64, t: f64, file_path: &str) {
-    // create a file
-    let mut file = fs::File::create(file_path).unwrap();
     // write text in the file
-    write!(file, "t, v, x\n").unwrap();
-    write!(file, "{}, {}, {},", t, v, x).unwrap()
+    let mut w = BufWriter::new(file);
+
+    // header
+    write!(w, "t, v, x\n").unwrap();
+    // write csv
+    for i in 0..n {
+        let s = format!(
+            "{},{},{}\n",
+            t[i], v[i], x[i],
+        );
+        write!(w, "{}", s).unwrap();
+    }
+
+    w.flush().unwrap();
+    Ok(())
 }
 
 fn plot(x: Vec<f64>, y: Vec<f64>, img_path: &str) {
     let mut fg = Figure::new();
     let img_path = img_path;
+
     fg.set_terminal("pngcairo", img_path);
     fg.axes2d().lines(&x, &y, &[Caption("EOM"), Color("blue")]);
     fg.show().unwrap();
