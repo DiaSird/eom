@@ -8,15 +8,15 @@ header-includes:
 ---
 
 Initial version: 2022/02/13
-Revised: 2022/02/14
+Revised: 2022/07/08
 
-# Rust numerical Simulation
+# Rust Equation of Motion
 
 ---
 
 ## Contents
 
-- [Rust numerical Simulation](#rust-numerical-simulation)
+- [Rust Equation of Motion](#rust-equation-of-motion)
   - [Contents](#contents)
   - [Simulation Sample](#simulation-sample)
   - [Make usage](#make-usage)
