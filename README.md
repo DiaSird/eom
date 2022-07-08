@@ -1,22 +1,13 @@
----
-title: Rust numerical
-author: DiaSird
-fontsize: 11pt
-header-includes:
-  - \lstset{numbers=left, frame=trlb, frameround=tttt, breaklines=true}
-  - \renewcommand{\lstlistingname}{Source Code}
----
+# Equation of Motion with Rust
 
 Initial version: 2022/02/13
 Revised: 2022/07/08
-
-# Equation of Motion with Rust
 
 ---
 
 ## Contents
 
-- [Rust Equation of Motion](#equation-of-motion-with-rust)
+- [Equation of Motion with Rust](#equation-of-motion-with-rust)
   - [Contents](#contents)
   - [Example](#example)
   - [Make usage](#make-usage)
@@ -33,15 +24,14 @@ $x - t$ curve;
 
 <p align="center">
 <img src="docs\output.png", width="80%">
-
 </p>
 
 ## Make usage
 
 | Command    |      Description       |
 | :--------- | :--------------------: |
-| `make run` |       cargo run        |
-| `make ch`  | (default:) cargo check |
+| `make run` | (default:) cargo run   |
+| `make ch`  |      cargo check       |
 
 If you are using windows, you can install the `make` command [here](http://gnuwin32.sourceforge.net/packages/make.htm).
 (Click the `Setup` button at the top.)
