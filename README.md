@@ -10,22 +10,20 @@ header-includes:
 Initial version: 2022/02/13
 Revised: 2022/07/08
 
-# Rust Equation of Motion
+# Equation of Motion with Rust
 
 ---
 
 ## Contents
 
-- [Rust Equation of Motion](#rust-equation-of-motion)
+- [Rust Equation of Motion](#equation-of-motion-with-rust)
   - [Contents](#contents)
-  - [Simulation Sample](#simulation-sample)
+  - [Example](#example)
   - [Make usage](#make-usage)
   - [Used version](#used-version)
   - [License](#license)
 
-## Simulation Sample
-
-Ref. docs/README.pdf
+## Example
 
 Equation of motion ($x = x(t)$)
 
