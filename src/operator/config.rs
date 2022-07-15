@@ -10,9 +10,7 @@ pub struct Config {
 
 impl Config {
     pub fn new() -> Result<Config, &'static str> {
-        let title = Local::now()
-            .format(&format!("%Y%m%d-%H%M%S"))
-            .to_string();
+        let title = Local::now().format(&format!("%Y%m%d-%H%M%S")).to_string();
 
         let out_name = "workspace";
         let dir_name = format!("{}/{}", &out_name, &title);

@@ -1,6 +1,6 @@
+// Measure CPU time
 use std::time::Instant;
 
-// measure CPU time
 pub fn time(start: Instant) {
     let end = start.elapsed();
     println!(

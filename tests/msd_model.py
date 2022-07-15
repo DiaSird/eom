@@ -1,9 +1,8 @@
-#!/usr/bin/env python3
-############################################################
-#
+#############################################
 # Comparison of output files
-#
-############################################################
+# 1. Move output files to the rst folder.
+# 2. Type "make test" in your terminal.
+#############################################
 import os
 import difflib
 
@@ -22,7 +21,7 @@ def check_rst(ref_file, check_file):
     diff = difflib.Differ()
 
     out_diff = diff.compare(ref_file.readlines(), check_file.readlines())
-    
+
     ans = True
     for data in out_diff :
         if data[0:1] in ['+', '-'] :
@@ -39,6 +38,6 @@ def check_rst(ref_file, check_file):
 
 
 if __name__ == "__main__":
-    ref_file = "ref_rst/ode_msd_model.csv"
-    check_file = "workspace/ode_msd_model.csv"
+    ref_file = "tests/ref_rst/ref_ode_msd_model.csv"
+    check_file = "tests/rst/ode_msd_model.csv"
     check_rst(ref_file, check_file)
